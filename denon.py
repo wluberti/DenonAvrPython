@@ -109,4 +109,4 @@ with DenonAvr(IPADDRESS, PORT, TIMEOUT) as avr:
     # avr.power('standby')
     avr.power('on')
     avr.changeInput('computer')
-    avr.volume(50)
+    avr.volume(60)
