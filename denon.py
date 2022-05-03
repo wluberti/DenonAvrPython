@@ -1,15 +1,12 @@
 #! /usr/bin/env python3
 
 """
- *
  * @Author: Wouter Luberti
  * @Copyright: MIT
  *
  * Full Denon protocol list can be found on:
  *    http://assets.eu.denon.com/DocumentMaster/DE/AVR2113CI_1913_PROTOCOL_V02.pdf
- *
- """
-
+"""
 from telnetlib import Telnet
 from time import sleep
 
@@ -17,6 +14,7 @@ DEFAULT_WAIT = 0.3  # in seconds, RFC requires minimum of 0.2 (200 miliseconds)
 IPADDRESS = '192.168.178.31'
 PORT = 23
 TIMEOUT = 30
+
 
 class DenonAvr:
     def __init__(self, ipAddress, port, timeout):
@@ -32,7 +30,7 @@ class DenonAvr:
         self.session.close()
 
     def setDebug(self, debugState = 9):
-        self.session.set_debuglevel(9)
+        self.session.set_debuglevel(debugState)
 
     def send(self, command, value = '?', timeToWaitForResponse = DEFAULT_WAIT):
         """ Send a command to the Telnet interface
@@ -55,10 +53,11 @@ class DenonAvr:
             'computer': 'CD',
             'mediapc': 'MPLAY',
             'tv': 'SAT/CBL',
+            'macbook': 'DVD',
         }
 
         if inputName not in lookupTable:
-            raise ValueError(f'Do not know what to do with {inputName}')
+            raise ValueError(f'Undefined inputName: {inputName}')
         else:
             forceChannel = True
             while forceChannel:
@@ -72,9 +71,10 @@ class DenonAvr:
         allowedStates = ['ON', 'STANDBY', '?']
 
         if state.upper() not in allowedStates:
-            raise ValueError(f'Do not know what to do with {state}')
+            raise ValueError(f'Undefined state: {state}')
         else:
-            self.send('ZM', state.upper(), 1.3) # RFC requires minimum of 1 second after power-on
+            # RFC requires minimum of 1 second after power-on
+            self.send('ZM', state.upper(), 1.3)
 
     def volume(self, volume):
         if not 0 <= volume <= 80:
@@ -105,8 +105,8 @@ class DenonAvr:
 
 with DenonAvr(IPADDRESS, PORT, TIMEOUT) as avr:
     # avr.setDebug()
-
     # avr.power('standby')
     avr.power('on')
-    avr.changeInput('computer')
+    avr.changeInput('macbook')
     avr.volume(60)
+    exit(0)
